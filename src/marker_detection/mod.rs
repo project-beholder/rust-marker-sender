@@ -29,7 +29,7 @@ pub struct MarkerDetector {
     cam: videoio::VideoCapture,
     frame: Mat,
     detector: objdetect::ArucoDetector,
-    marker_array: Vec<Vec<f32>>
+    marker_array: Vec<Vec<f32>>,
 }
 
 pub fn create_marker_detector() -> MarkerDetector {
@@ -44,6 +44,10 @@ pub fn create_marker_detector() -> MarkerDetector {
         detector: objdetect::ArucoDetector::new(&dict, &param, refine).unwrap(),
         marker_array: Vec::new()
     };
+    if (!detector.cam.open(0, videoio::CAP_ANY).unwrap()) {
+        panic!("Unable to open camera");
+    }
+
     detector.initialize_vector();
 
     detector
@@ -86,7 +90,7 @@ impl MarkerDetector {
                 self.marker_array[id][1] = y;
             }
             // Uncomment line below to show debug camera window
-            // highgui::imshow("beholder", &self.frame).unwrap();
+            highgui::imshow("beholder", &self.frame).unwrap();
         }
 
     } 
@@ -97,9 +101,9 @@ impl MarkerDetector {
 
         let marker_str: String = self.marker_array
             .iter()
-            .map( |point| format!("{},{} ", point[0].to_string(), point[1].to_string()))
+            .map( |point| format!("{} {} ", point[0].to_string(), point[1].to_string()))
             .collect();
 
-        marker_str + &String::from("\n")
+        marker_str
     }
 }
